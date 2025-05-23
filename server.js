@@ -7,6 +7,29 @@ const FormData = require("form-data")
 
 const app = express();
 
+//Class to store and handle exam answers by student
+class Student{
+    constructor(name, id, answers){
+        this.name = name;
+        this.id = id;
+        this.answers = answers;
+    }
+}
+
+//Function to getAnswers from rawHTML
+function getAnswers(content){
+    const lines = content.split("<br>");
+    let answers = [];
+
+    for(let i = 0; i<lines.length; i++){
+        if (i % 2 != 0){
+            answers.push(lines[i].trim());
+        }
+    }
+
+    return answers;
+}
+
 app.use( (req, res, next) =>{
     res.header('Access-Control-Allow-Origin', '*');
     next();
@@ -35,9 +58,24 @@ app.post("/uploads", upload.single("document"), async (req, res) =>{
         },
     })
 
-    res.json({parsedHtml: response.data});
-
-
+    //Handling Document parser API response (rawHTML)
+        let $ = cheerio.load(response.data.content.html);
+    
+        studentName = $("tbody td").first().html();
+        studentID = $("tbody td").eq(1).html();
+        
+        paragraphContent = $("p").html();
+    
+        studentAnswers = getAnswers(paragraphContent);
+    
+        //Creating an object to store the info from each exam paper
+        let student = new Student(studentName, studentID, studentAnswers);
+    
+        res.json({
+            studentName: student.name,
+            studentID : student.id,
+            answers : student.answers
+        })
 })
 
 app.get("/", (req, res)=>{
