@@ -1,0 +1,25 @@
+{
+  "name": "daic-ai-got-this",
+  "version": "1.0.0",
+  "description": "> **PNU x Upstage: DOCUMENT AI CHALLENGE 리포지토리 템플릿입니다. 아래 마크다운을 프로젝트 리포지토리 형식에 맞춰서 리드미를 작성해주시면 됩니다.**",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+
+  "dependencies": {
+    "axios": "^1.9.0",
+    "express": "^5.1.0",
+    "form-data": "^4.0.2",
+    "fs": "^0.0.1-security",
+    "multer": "^2.0.0",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
