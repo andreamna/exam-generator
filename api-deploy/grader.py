@@ -1,24 +1,18 @@
-
 from sentence_transformers import SentenceTransformer, util
-from transformers import pipeline
 from rake_nltk import Rake
+from functools import lru_cache
 import torch
 import nltk
 nltk.download("punkt_tab")
 
-
-model = SentenceTransformer('princeton-nlp/sup-simcse-bert-base-uncased')
-
-nli_pipeline = pipeline("text-classification", model="roberta-large-mnli")
+@lru_cache()
+def get_model():
+    return SentenceTransformer('all-MiniLM-L6-v2')
 
 def get_similarity(student_ans, correct_ans):
+    model = get_model()
     embeddings = model.encode([student_ans, correct_ans], convert_to_tensor=True)
     return util.pytorch_cos_sim(embeddings[0], embeddings[1]).item()
-
-def contradiction_check(student_ans, correct_ans):
-    input_text = student_ans.strip() + " </s></s> " + correct_ans.strip()
-    result = nli_pipeline(input_text)[0]
-    return result['label']
 
 def extract_keywords(text):
     rake = Rake()
@@ -47,10 +41,6 @@ def hybrid_grade(student_ans, correct_ans, min_match=1):
     keywords = extract_keywords(correct_ans)
     sim_score = get_similarity(student_ans, correct_ans)
     matched_keywords = keyword_match(student_ans, keywords)
-
-    nli_label = contradiction_check(student_ans, correct_ans)
-    if nli_label == "CONTRADICTION":
-        return "Incorrect", sim_score, "Contradiction detected"
 
     if sim_score >= 0.70:
         return "Correct", sim_score, "High semantic similarity"
