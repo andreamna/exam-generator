@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: exam-grader
-    runtime: python
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: python grader_api.py
-    envVars:
-      - key: HF_HUB_ENABLE_HF_TRANSFER
-        value: "1"
