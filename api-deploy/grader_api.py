@@ -1,18 +1,21 @@
+from flask import Flask, request, jsonify
 from sentence_transformers import SentenceTransformer, util
+from transformers import pipeline
 from rake_nltk import Rake
-from functools import lru_cache
 import torch
-import nltk
-nltk.download("punkt_tab")
+import os
 
-@lru_cache()
-def get_model():
-    return SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('princeton-nlp/sup-simcse-bert-base-uncased')
+nli_pipeline = pipeline("text-classification", model="roberta-large-mnli")
 
 def get_similarity(student_ans, correct_ans):
-    model = get_model()
     embeddings = model.encode([student_ans, correct_ans], convert_to_tensor=True)
     return util.pytorch_cos_sim(embeddings[0], embeddings[1]).item()
+
+def contradiction_check(student_ans, correct_ans):
+    input_text = student_ans.strip() + " </s></s> " + correct_ans.strip()
+    result = nli_pipeline(input_text)[0]
+    return result['label']
 
 def extract_keywords(text):
     rake = Rake()
@@ -42,6 +45,10 @@ def hybrid_grade(student_ans, correct_ans, min_match=1):
     sim_score = get_similarity(student_ans, correct_ans)
     matched_keywords = keyword_match(student_ans, keywords)
 
+    nli_label = contradiction_check(student_ans, correct_ans)
+    if nli_label == "CONTRADICTION":
+        return "Incorrect", sim_score, "Contradiction detected"
+
     if sim_score >= 0.70:
         return "Correct", sim_score, "High semantic similarity"
     elif sim_score >= 0.45 and len(matched_keywords) >= min_match:
@@ -52,28 +59,24 @@ def hybrid_grade(student_ans, correct_ans, min_match=1):
 def grade_question(student_ans, correct_ans, qtype="short"):
     if qtype == "short":
         return hybrid_grade(student_ans, correct_ans)
-    
     elif qtype == "mcq":
         return (
-            "Correct" if student_ans.strip().upper() == correct_ans.strip().upper() 
+            "Correct" if student_ans.strip().upper() == correct_ans.strip().upper()
             else "Incorrect"
         ), 1.0, "Multiple choice"
-    
     elif qtype == "truefalse":
         return (
-            "Correct" if student_ans.strip().lower() == correct_ans.strip().lower() 
+            "Correct" if student_ans.strip().lower() == correct_ans.strip().lower()
             else "Incorrect"
         ), 1.0, "True/False"
-
     elif qtype == "numerical":
         try:
             return (
-                "Correct" if abs(float(student_ans) - float(correct_ans)) <= 0.01 
+                "Correct" if abs(float(student_ans) - float(correct_ans)) <= 0.01
                 else "Incorrect"
             ), 1.0, "Numerical match"
         except:
             return "Invalid Answer", 0.0, "Could not parse numerical answer"
-    
     else:
         return "Unknown", 0.0, "Unsupported question type"
 
@@ -90,5 +93,26 @@ def grade_exam(student_answers: dict, model_answers: dict) -> dict:
 
         grade, score, reason = grade_question(student_ans, correct_ans, qtype)
         results[qid] = {"grade": grade, "score": score, "reason": reason}
-    
+
     return results
+
+app = Flask(__name__)
+
+@app.route("/grade", methods=["POST"])
+def grade():
+    try:
+        data = request.get_json()
+        student_answers = data.get("student_answers")
+        model_answers = data.get("model_answers")
+
+        if not student_answers or not model_answers:
+            return jsonify({"error": "Missing student_answers or model_answers"}), 400
+
+        results = grade_exam(student_answers, model_answers)
+        return jsonify(results)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+port = int(os.environ.get("PORT", 7860))
+app.run(host="0.0.0.0", port=port)
