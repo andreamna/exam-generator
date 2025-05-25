@@ -1,5 +1,9 @@
 # Sentence similarity + NLI
+<<<<<<< HEAD
 torch==2.2.0      
+=======
+torch==2.2.0       
+>>>>>>> 7e0fe733c1cc59af0693695e45c9bc7958732860
 transformers==4.37.2    
 sentence-transformers==2.2.2  
 rake-nltk==1.0.6
