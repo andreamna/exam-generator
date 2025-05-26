@@ -10,6 +10,7 @@
 
 ```md
 # [프로젝트 이름]
+Automatic Grading and Exam Generator System
 
 ## 📌 개요
 Document Parse과 AI 기술을 활용하여 강의 자료를 기반으로 학생이 작셩한 학교 시험 답안을 자동 평가하고 시험지를 자동 생성할 수 있는 서비스입니다.
