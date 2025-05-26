@@ -9,7 +9,7 @@ gradeBtn.addEventListener('click', async () => {
     return alert('Please upload both files.');
   }
   resultArea.textContent = 'Grading in progress…';
-  // fetch('/api/grade', …) etc.
+  uploadFiles();
 });
 
 // Mobile menu toggle
@@ -20,3 +20,25 @@ hamburgerBtn.addEventListener('click', () => {
   const isVisible = mobileMenu.style.display === 'flex';
   mobileMenu.style.display = isVisible ? 'none' : 'flex';
 });
+
+//Function to upload files to the backend server
+function uploadFiles(){
+  const input = document.getElementById("studentInput");
+  const files = input.files;
+
+  const formData = new FormData();
+  for(let i = 0; i<files.length; i++){
+    formData.append('documents', files[i]);
+  }
+
+  fetch('/uploads', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Upload failed");
+  })
+  .catch(err => {
+    console.error("Upload error:", err.message);
+  })
+}
