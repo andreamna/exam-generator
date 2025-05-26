@@ -3,57 +3,118 @@
 <head>
   <meta charset="UTF-8" />
   <title>Exam Marking System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="style.css" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <div class="nav-left">
-      <img src="pnu.png" alt="Logo" class="logo">
-      <a href="#" class="nav-link">Home</a>
-    </div>
-
-    <div class="nav-center">
-      <input type="text" placeholder="Search..." class="nav-search">
-    </div>
-
-    <div class="nav-right">
-      <button class="icon-btn" title="Notifications">🔔</button>
-      <button class="icon-btn" title="User Menu">👤</button>
-      <button class="hamburger" id="hamburgerBtn">☰</button>
-    </div>
-
-    <!-- Mobile dropdown -->
-    <nav class="mobile-menu" id="mobileMenu">
-      <a href="#" class="mobile-link">Home</a>
-      <a href="#upload" class="mobile-link">Upload</a>
-      <a href="#grade" class="mobile-link">Grade</a>
-      <a href="#reports" class="mobile-link">Reports</a>
-      <a href="#settings" class="mobile-link">Settings</a>
-    </nav>
+  <!-- Fixed Header -->
+  <header class="header">
+    <img src="pnu.png" alt="PNU Logo" class="logo">
+    <a href="#" data-view="home" class="home-link">Home</a>
   </header>
 
-  <!-- MAIN CONTENT -->
-  <main>
-    <section id="upload">
+  <main class="main">
+
+    <!-- HOME -->
+    <section id="home" class="view">
       <h1>Exam Marking System</h1>
-      <div class="file-group">
-        <label for="templateInput">1. Upload Exam Template</label>
-        <input id="templateInput" type="file" accept=".pdf,.ppt,.png,.jpg">
+      <div class="home-buttons">
+        <button data-view="create" class="btn">Create Exam Template</button>
+        <button data-view="grade"  class="btn">Grade Exams</button>
       </div>
+    </section>
+
+    <!-- CREATE -->
+    <section id="create" class="view hidden">
+      <h1>Create Exam Template</h1>
+
+      <!-- Drag & Drop Upload -->
       <div class="file-group">
-        <label for="studentInput">2. Upload Student Paper</label>
-        <input id="studentInput" type="file" name="documents" accept=".pdf,.jpg,.png" multiple>
+        <label>Upload Lecture Materials</label>
+        <div id="materialsDrop" class="drop-zone">
+          <span>Drag & Drop files here or click to select</span>
+          <input id="materialsInput" type="file" multiple>
+        </div>
+        <ul id="materialsList" class="file-list"></ul>
       </div>
+
+      <!-- Question Counts -->
+      <div class="type-count">
+        <h2>Number of Questions</h2>
+        <label>True/False:<input id="count-truefalse" type="number" min="0" value="0"></label>
+        <label>Multiple Choice:<input id="count-multiple" type="number" min="0" value="0"></label>
+        <label>Short Answer:<input id="count-short" type="number" min="0" value="0"></label>
+        <label>Numerical:<input id="count-numeric" type="number" min="0" value="0"></label>
+      </div>
+
+      <button id="genExamBtn" data-view="preview" class="btn">Generate Exam</button>
+    </section>
+
+    <!-- PREVIEW -->
+    <section id="preview" class="view hidden">
+      <h1>Exam Template</h1>
+      <div id="questionsContainer" class="questions-container">
+        <!-- injected -->
+      </div>
+
+      <!-- New Question -->
+      <div class="file-group">
+        <label>New Question</label>
+        <textarea id="newQuestion" rows="2" placeholder="Enter question"></textarea>
+        <label>Answer</label>
+        <textarea id="newAnswer" rows="1" placeholder="Enter answer"></textarea>
+        <label>Type</label>
+        <select id="newType">
+          <option value="truefalse">True/False</option>
+          <option value="multiple">Multiple Choice</option>
+          <option value="short">Short Answer</option>
+          <option value="numeric">Numerical</option>
+        </select>
+        <div class="btn-group">
+          <button id="insertDirect" class="btn small">Insert Directly</button>
+          <button id="insertAI"     class="btn small">Let AI Do It</button>
+        </div>
+      </div>
+
+      <div class="home-buttons">
+        <button id="downloadExam" class="btn small">Download Exam</button>
+        <button id="downloadKey"  class="btn small">Download Answer Key</button>
+      </div>
+    </section>
+
+    <!-- GRADE -->
+    <section id="grade" class="view hidden">
+      <h1>Grade Exams</h1>
+
+      <!-- Template Upload -->
+      <div class="file-group">
+        <label>1. Upload Exam Template</label>
+        <div id="templateDrop" class="drop-zone">
+          <span>Drag & Drop or click</span>
+          <input id="templateInput" type="file" accept=".pdf,.ppt,.png,.jpg">
+        </div>
+        <ul id="templateList" class="file-list"></ul>
+      </div>
+
+      <!-- Student Paper Upload -->
+      <div class="file-group">
+        <label>2. Upload Student Paper</label>
+        <div id="studentDrop" class="drop-zone">
+          <span>Drag & Drop or click</span>
+          <input id="studentInput" type="file" name="documents" accept=".pdf,.jpg,.png" multiple>
+        </div>
+        <ul id="studentList" class="file-list"></ul>
+      </div>
+
       <button id="gradeBtn" class="btn">Grade</button>
       <pre id="result"></pre>
     </section>
+
   </main>
 
+  <!-- jsPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
