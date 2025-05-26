@@ -1,7 +1,0 @@
-# ignore all .env files
-**/.env
-
-# ignore node modules anywhere
-node_modules/
-database/node_modules/
-frontend/node_modules/

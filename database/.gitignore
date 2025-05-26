@@ -1,0 +1,10 @@
+# node
+node_modules/
+# SQLite
+data.db
+# Multer uploads
+uploads/
+# VSCode settings
+.vscode/
+# OS files
+*.log

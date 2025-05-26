@@ -10,11 +10,72 @@
 
   <!-- Fixed Header -->
   <header class="header">
+    <button id="hamburgerBtn" class="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
     <img src="pnu.png" alt="PNU Logo" class="logo">
-    <a href="#" data-view="home" class="home-link">Home</a>
+    <nav>
+      <a href="#" data-view="home" class="home-link">Home</a>
+      <a href="#" id="logoutLink" class="home-link hidden">Logout</a>
+    </nav>
   </header>
 
+  <!-- Slide-out menu -->
+  <aside id="sideMenu" class="side-menu">
+    <ul>
+      <li><strong id="menuUser">Guest</strong></li>
+      <li><a href="#" id="menuLogin">Login</a></li>
+      <li><a href="#" id="menuSignup">Sign Up</a></li>
+      <li><a href="#" data-view="lectures" class="menu-link">Lecture Library</a></li>
+      <li><a href="#" data-view="previous" class="menu-link">Gradebook</a></li>
+      <li><a href="#" id="menuLogout" class="hidden">Logout</a></li>
+    </ul>
+  </aside>
+
   <main class="main">
+
+    <!-- LOGIN -->
+    <section id="login" class="view hidden">
+      <h1>Login</h1>
+      <div class="file-group">
+        <label for="loginId">ID</label>
+        <input type="text" id="loginId" placeholder="Enter your ID">
+      </div>
+      <div class="file-group">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password">
+      </div>
+      <button id="loginBtn" class="btn">Login</button>
+      <p class="switch-link">
+        Don't have an account? <a href="#" id="toSignup">Sign Up</a>
+      </p>
+    </section>
+
+    <!-- SIGNUP -->
+    <section id="signup" class="view hidden">
+      <h1>Sign Up</h1>
+      <div class="file-group">
+        <label for="signupId">ID</label>
+        <input type="text" id="signupId" placeholder="Choose an ID">
+      </div>
+      <div class="file-group">
+        <label for="signupName">Name</label>
+        <input type="text" id="signupName" placeholder="Your name">
+      </div>
+      <div class="file-group">
+        <label for="signupEmail">Email</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com">
+      </div>
+      <div class="file-group">
+        <label for="signupPassword">Password</label>
+        <input type="password" id="signupPassword" placeholder="Password">
+      </div>
+      <div class="file-group">
+        <label for="signupConfirm">Confirm Password</label>
+        <input type="password" id="signupConfirm" placeholder="Confirm password">
+      </div>
+      <button id="signupBtn" class="btn">Sign Up</button>
+    </section>
 
     <!-- HOME -->
     <section id="home" class="view">
@@ -28,8 +89,6 @@
     <!-- CREATE -->
     <section id="create" class="view hidden">
       <h1>Create Exam Template</h1>
-
-      <!-- Drag & Drop Upload -->
       <div class="file-group">
         <label>Upload Lecture Materials</label>
         <div id="materialsDrop" class="drop-zone">
@@ -38,8 +97,6 @@
         </div>
         <ul id="materialsList" class="file-list"></ul>
       </div>
-
-      <!-- Question Counts -->
       <div class="type-count">
         <h2>Number of Questions</h2>
         <label>True/False:<input id="count-truefalse" type="number" min="0" value="0"></label>
@@ -47,18 +104,13 @@
         <label>Short Answer:<input id="count-short" type="number" min="0" value="0"></label>
         <label>Numerical:<input id="count-numeric" type="number" min="0" value="0"></label>
       </div>
-
       <button id="genExamBtn" data-view="preview" class="btn">Generate Exam</button>
     </section>
 
     <!-- PREVIEW -->
     <section id="preview" class="view hidden">
       <h1>Exam Template</h1>
-      <div id="questionsContainer" class="questions-container">
-        <!-- injected -->
-      </div>
-
-      <!-- New Question -->
+      <div id="questionsContainer" class="questions-container"></div>
       <div class="file-group">
         <label>New Question</label>
         <textarea id="newQuestion" rows="2" placeholder="Enter question"></textarea>
@@ -76,7 +128,6 @@
           <button id="insertAI"     class="btn small">Let AI Do It</button>
         </div>
       </div>
-
       <div class="home-buttons">
         <button id="downloadExam" class="btn small">Download Exam</button>
         <button id="downloadKey"  class="btn small">Download Answer Key</button>
@@ -87,7 +138,12 @@
     <section id="grade" class="view hidden">
       <h1>Grade Exams</h1>
 
-      <!-- Template Upload -->
+      <!-- Exam name/code input -->
+      <div class="file-group">
+        <label for="examCodeInput">Exam Name / Code</label>
+        <input type="text" id="examCodeInput" placeholder="e.g. CS101-Midterm">
+      </div>
+
       <div class="file-group">
         <label>1. Upload Exam Template</label>
         <div id="templateDrop" class="drop-zone">
@@ -97,23 +153,73 @@
         <ul id="templateList" class="file-list"></ul>
       </div>
 
-      <!-- Student Paper Upload -->
       <div class="file-group">
-        <label>2. Upload Student Paper</label>
+        <label>2. Upload the Answer Key</label>
+        <div id="answerKeyDrop" class="drop-zone">
+          <span>Drag & Drop or click</span>
+          <input id="answerKeyInput" type="file" accept=".pdf,.ppt,.png,.jpg">
+        </div>
+        <ul id="answerKeyList" class="file-list"></ul>
+      </div>
+
+      <div class="file-group">
+        <label>3. Upload Student Papers (multiple)</label>
         <div id="studentDrop" class="drop-zone">
           <span>Drag & Drop or click</span>
+<<<<<<< HEAD
           <input id="studentInput" type="file" name="documents" accept=".pdf,.jpg,.png" multiple>
+=======
+          <input id="studentInput" type="file" accept=".pdf,.jpg,.png" multiple>
+>>>>>>> dab05dd (frontend+database)
         </div>
         <ul id="studentList" class="file-list"></ul>
       </div>
 
-      <button id="gradeBtn" class="btn">Grade</button>
-      <pre id="result"></pre>
+      <button id="gradeBatchBtn" class="btn">Grade All with AI</button>
+
+<!-- initially hidden -->
+<div id="resultsSection" class="hidden">
+  <h2>Results</h2>
+  <table id="batchResults" class="file-list">
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Name</th>
+        <th>Score</th>
+        <th>Download</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+    </section>
+
+    <!-- GRADEBOOK -->
+    <section id="previous" class="view hidden">
+      <h1>Gradebook</h1>
+      <table id="gradebookTable" class="file-list">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Exam</th>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- LECTURE LIBRARY -->
+    <section id="lectures" class="view hidden">
+      <h1>Lecture Library</h1>
+      <ul id="lecturesList" class="file-list"></ul>
     </section>
 
   </main>
 
-  <!-- jsPDF CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
