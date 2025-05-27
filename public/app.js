@@ -114,7 +114,6 @@ document.getElementById('insertDirect').onclick = () => {
 document.getElementById('insertAI').onclick =
   () => document.getElementById('insertDirect').click();
 
-<<<<<<< HEAD
 hamburgerBtn.addEventListener('click', () => {
   const isVisible = mobileMenu.style.display === 'flex';
   mobileMenu.style.display = isVisible ? 'none' : 'flex';
@@ -142,10 +141,6 @@ function uploadFiles(){
   })
 }
 // Download Exam as PDF
-=======
-
-// DOWNLOAD EXAM PDF
->>>>>>> dab05dd (frontend+database)
 document.getElementById('downloadExam').onclick = () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
