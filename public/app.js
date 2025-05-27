@@ -54,6 +54,7 @@ function setupDropZone(z, i, l) {
 
 // GENERATE → PREVIEW
 document.getElementById('genExamBtn').onclick = () => {
+  uploadGenerating();
   const counts = {
     truefalse: +document.getElementById('count-truefalse').value,
     multiple:  +document.getElementById('count-multiple').value,
@@ -122,10 +123,10 @@ document.getElementById('insertDirect').onclick = () => {
 document.getElementById('insertAI').onclick =
   () => document.getElementById('insertDirect').click();
 
-hamburgerBtn.addEventListener('click', () => {
+/*hamburgerBtn.addEventListener('click', () => {
   const isVisible = mobileMenu.style.display === 'flex';
   mobileMenu.style.display = isVisible ? 'none' : 'flex';
-});
+});*/
 
 //Function to upload files to the backend server
 function uploadFiles(){
@@ -213,16 +214,13 @@ document.getElementById('menuSignup').onclick = e => {
 document.getElementById('loginBtn').onclick = async () => {
   const id = document.getElementById('loginId').value.trim(),
         pw = document.getElementById('loginPassword').value;
-  const res = await fetch('/login', {
+  const res = await fetch('http://localhost:3000/login', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ id, password: pw })
+    body:JSON.stringify({id: id, password: pw })
   });
-  if (res.ok) {
-    await checkAuth();
-    showView('home');
-  } else {
-    alert('Login failed: ' + (await res.json()).error);
+  if (res == "Not found"){
+    //Handle logic
   }
 };
 
@@ -234,18 +232,16 @@ document.getElementById('signupBtn').onclick = async () => {
     password:document.getElementById('signupPassword').value,
     confirm: document.getElementById('signupConfirm').value
   };
-  const res = await fetch('/signup', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
-  });
-  if (res.ok) {
-    alert('Account created! Please log in.');
-    resetLoginForm();
-    showView('login');
-  } else {
-    alert('Sign up error: ' + (await res.json()).error);
-  }
+
+  fetch("http://localhost:3000/users", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({id: payload.id, name: payload.name, email: payload.email, password: payload.password})
+  })
+  .then(res => res.text())
+  .then(data => console.log(data));
 };
 
 // LOGOUT (same handler for header & menu)
@@ -309,7 +305,9 @@ document.querySelectorAll('.menu-link').forEach(btn =>
 
 // BATCH GRADING (AI)
 document.getElementById('gradeBatchBtn').onclick = async () => {
-  const tpl  = document.getElementById('templateInput').files[0];
+  console.log("Hello");
+  uploadGrading();
+  /*const tpl  = document.getElementById('templateInput').files[0];
   const key  = document.getElementById('answerKeyInput').files[0];
   const subs = Array.from(document.getElementById('studentInput').files);
   if (!tpl || !key || !subs.length) {
@@ -343,5 +341,70 @@ document.getElementById('gradeBatchBtn').onclick = async () => {
       <td><a href="${r.paperUrl}" download>Download</a></td>
     </tr>`
   ).join('');
-  document.getElementById('resultsSection').classList.remove('hidden');
+  document.getElementById('resultsSection').classList.remove('hidden');*/
 };
+
+
+//My own functions
+function uploadGrading(){
+  console.log("Hello");
+  const answerKeyInput = document.getElementById("answerKeyInput");
+  const answerKey = answerKeyInput.files;
+
+  const examPaperInput = document.getElementById("studentInput");
+  const examPapers = examPaperInput.files;
+
+  const akformData = new FormData();
+  akformData.append("answerKey", answerKey[0]);
+
+  const epformData = new FormData();
+  for(let i = 0; i<examPapers.length; i++){
+    epformData.append("examPapers", examPapers[i]);
+  }
+
+  fetch('/answerKey/upload', {
+    method: 'POST',
+    body: akformData
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Upload failed");
+  })
+  .catch(err => {
+    console.error("Upload error:", err.message);
+  })
+
+  fetch('/examPapers/upload', {
+    method: 'POST',
+    body: epformData
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Upload failed");
+  })
+  .catch(err => {
+    console.error("Upload error:", err.message);
+  })
+}
+
+
+
+//My own functions
+function uploadGenerating(){
+  const lectureMaterialsInput = document.getElementById("materialsInput");
+  const lectureMaterials = lectureMaterialsInput.files;
+
+  const formData = new FormData();
+  for(let i = 0; i<lectureMaterials.length; i++){
+    formData.append('lectureMaterials', lectureMaterials[i]);
+  }
+
+  fetch('/lectureMaterials/upload', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Upload failed");
+  })
+  .catch(err => {
+    console.error("Upload error:", err.message);
+  })
+}
