@@ -1,3 +1,5 @@
+
+
 // VIEW SWITCHING
 function showView(id) {
   document.querySelectorAll('.view')
@@ -29,6 +31,7 @@ function setupDropZone(z, i, l) {
   const zone = document.getElementById(z),
         inp  = document.getElementById(i),
         lst  = document.getElementById(l);
+
   function refresh() {
     lst.innerHTML = '';
     Array.from(inp.files).forEach(f => {
@@ -37,8 +40,14 @@ function setupDropZone(z, i, l) {
       lst.appendChild(li);
     });
   }
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+
+  zone.addEventListener('dragover', e => { 
+    e.preventDefault(); 
+    one.classList.add('dragover');
+  });
+  zone.addEventListener('dragleave', () => {
+    zone.classList.remove('dragover');
+  });
   zone.addEventListener('drop', e => {
     e.preventDefault();
     zone.classList.remove('dragover');
@@ -47,9 +56,13 @@ function setupDropZone(z, i, l) {
   });
   inp.addEventListener('change', refresh);
 }
-['materials','template','answerKey','student'].forEach(pref =>
-  setupDropZone(pref + 'Drop', pref + 'Input', pref + 'List')
-);
+
+['materials','template','answerKey','student']
+.forEach(pref => setupDropZone(
+  pref + 'Drop', 
+  pref + 'Input', 
+  pref + 'List'
+));
 
 
 // GENERATE → PREVIEW
@@ -81,11 +94,15 @@ document.getElementById('genExamBtn').onclick = () => {
 // REORDER & REMOVE
 const cont = document.getElementById('questionsContainer');
 let dragSrc = null;
+
 cont.addEventListener('dragstart', e => {
   if (!e.target.classList.contains('question-line')) return;
-  dragSrc = e.target; e.target.classList.add('dragging');
+  dragSrc = e.target; 
+  e.target.classList.add('dragging');
 });
-cont.addEventListener('dragend', e => e.target.classList.remove('dragging'));
+cont.addEventListener('dragend', e =>{ 
+  e.target.classList.remove('dragging');
+});
 cont.addEventListener('dragover', e => {
   e.preventDefault();
   const tgt = e.target.closest('.question-line');
@@ -115,6 +132,7 @@ document.getElementById('insertDirect').onclick = () => {
   const idx = cont.children.length + 1;
   const d = document.createElement('div');
   d.className = 'question-line'; d.draggable = true;
+  d.draggable = true;
   d.innerHTML = `<span>${idx}.</span><span>${q}</span><button class="remove-btn">Remove</button>`;
   cont.appendChild(d);
   document.getElementById('newQuestion').value = '';
@@ -123,32 +141,6 @@ document.getElementById('insertDirect').onclick = () => {
 document.getElementById('insertAI').onclick =
   () => document.getElementById('insertDirect').click();
 
-/*hamburgerBtn.addEventListener('click', () => {
-  const isVisible = mobileMenu.style.display === 'flex';
-  mobileMenu.style.display = isVisible ? 'none' : 'flex';
-});*/
-
-//Function to upload files to the backend server
-function uploadFiles(){
-  const input = document.getElementById("studentInput");
-  const files = input.files;
-
-  const formData = new FormData();
-  for(let i = 0; i<files.length; i++){
-    formData.append('documents', files[i]);
-  }
-
-  fetch('/uploads', {
-    method: 'POST',
-    body: formData
-  })
-  .then(res => {
-    if (!res.ok) throw new Error("Upload failed");
-  })
-  .catch(err => {
-    console.error("Upload error:", err.message);
-  })
-}
 // Download Exam as PDF
 document.getElementById('downloadExam').onclick = () => {
   const { jsPDF } = window.jspdf;
@@ -172,7 +164,6 @@ ham.addEventListener('click', () => side.classList.toggle('open'));
 side.querySelectorAll('a').forEach(a =>
   a.addEventListener('click', () => side.classList.remove('open'))
 );
-
 
 // AUTH & MENU STATE
 async function updateMenu(user){
@@ -254,53 +245,28 @@ document.getElementById('menuLogout').onclick = async () => {
 };
 
 
-// PERSONAL INFO
-document.querySelector('[data-view="personal"]').addEventListener('click', async () => {
-  const res     = await fetch('/auth-status'),
-        { user } = await res.json();
-  if (!user) return;
-  document.getElementById('profileId').textContent           = user.id;
-  document.getElementById('profileNameDisplay').textContent  = user.name;
-  document.getElementById('profileEmailDisplay').textContent = user.email || '—';
-});
-
-
-// GRADEBOOK
-const gradeList = new List('previous', {
-  valueNames: ['date','exam','studentid','studentname','score']
-});
-
 async function loadGradebook() {
   const res = await fetch('/scores');
   if (!res.ok) return alert('Please log in first');
   const grades = await res.json();
-  gradeList.clear();
-  grades.forEach(g => gradeList.add({
-    date:        g.date.split('T')[0],
-    exam:        g.examName || 'Exam',
-    studentid:   g.studentId,
-    studentname: g.studentName,
-    score:       g.score
-  }));
+
+  const tbody = document.querySelector('#gradebookTable tbody');
+  tbody.innerHTML = grades.map(g => `
+    <tr>
+      <td>${g.date.split('T')[0]}</td>
+      <td>${g.examName || 'Exam'}</td>
+      <td>${g.studentId}</td>
+      <td>${g.studentName}</td>
+      <td>${g.score}</td>
+    </tr>
+  `).join('');
 }
 
-// Download Excel
-document.getElementById('exportExcelBtn').onclick = () => {
-  const data = gradeList.items.map(i => i.values());
-  const ws   = XLSX.utils.json_to_sheet(data);
-  const wb   = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Gradebook');
-  XLSX.writeFile(wb, 'gradebook.xlsx');
-};
-
-// Hook gradebook submenu
-document.querySelectorAll('.menu-link').forEach(btn =>
-  btn.addEventListener('click', () => {
-    const v = btn.dataset.view;
-    showView(v);
-    if (v === 'previous') loadGradebook();
-  })
-);
+// Hook Gradebook menu link
+document.querySelector('[data-view="previous"]').addEventListener('click', () => {
+  showView('previous');
+  loadGradebook();
+});
 
 
 // BATCH GRADING (AI)

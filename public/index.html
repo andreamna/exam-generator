@@ -36,7 +36,6 @@
       <li><strong id="menuUser">Guest</strong></li>
       <li><a href="#" id="menuLogin">Login</a></li>
       <li><a href="#" id="menuSignup">Sign Up</a></li>
-      <li><a href="#" data-view="personal" class="menu-link hidden">Personal Info</a></li>
       <li><a href="#" data-view="previous" class="menu-link hidden">Gradebook</a></li>
       <li><a href="#" id="menuLogout" class="hidden">Logout</a></li>
     </ul>
@@ -94,15 +93,6 @@
         <button data-view="create" class="btn primary-btn">Create Exam Template</button>
         <button data-view="grade" class="btn accent-btn">Grade Exams</button>
       </div>
-    </section>
-
-    <!-- PERSONAL INFO -->
-    <section id="personal" class="view hidden">
-      <button class="back btn small">&larr; Go Back</button>
-      <h1>My Profile</h1>
-      <div class="file-group"><strong>ID:</strong> <span id="profileId">—</span></div>
-      <div class="file-group"><strong>Name:</strong> <span id="profileNameDisplay">—</span></div>
-      <div class="file-group"><strong>Email:</strong> <span id="profileEmailDisplay">—</span></div>
     </section>
 
     <!-- CREATE -->
@@ -209,10 +199,13 @@
     <section id="previous" class="view hidden">
       <button class="back btn small">&larr; Go Back</button>
       <h1>Gradebook</h1>
+
       <p>Enter the exam name/code:</p>
-      <div class="file-group">
-        <input class="search" id="gradeSearch" placeholder="Search…">
+      <div class="file-group search-group">
+        <input type="text" id="gradeSearch" placeholder="Search…" />
+     <!--   <button id="gradeSearchBtn" class="btn small">Search</button>-->
       </div>
+
       <table id="gradebookTable" class="file-list">
         <thead>
           <tr>
