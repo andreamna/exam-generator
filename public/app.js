@@ -245,6 +245,9 @@ document.getElementById('menuLogout').onclick = async () => {
 };
 
 
+
+
+
 async function loadGradebook() {
   const res = await fetch('/scores');
   if (!res.ok) return alert('Please log in first');
@@ -267,6 +270,48 @@ document.querySelector('[data-view="previous"]').addEventListener('click', () =>
   showView('previous');
   loadGradebook();
 });
+
+
+
+
+/*
+// GRADEBOOK
+async function loadGradebook(filter = '') {
+  const res = await fetch('/scores');
+  if (!res.ok) return alert('Please log in first');
+
+  const grades = await res.json();
+  // if a filter term is provided, only keep matching examNames
+  const filtered = filter
+    ? grades.filter(g =>
+        g.examName.toLowerCase().includes(filter.toLowerCase())
+      )
+    : grades;
+
+  const tbody = document.querySelector('#gradebookTable tbody');
+  tbody.innerHTML = filtered.map(g => `
+    <tr>
+      <td>${g.date.split('T')[0]}</td>
+      <td>${g.examName || 'Exam'}</td>
+      <td>${g.studentId}</td>
+      <td>${g.studentName}</td>
+      <td>${g.score}</td>
+    </tr>
+  `).join('');
+}*/
+
+// When you click the “Gradebook” menu item, load them all
+document.querySelector('[data-view="previous"]').addEventListener('click', () => {
+  showView('previous');
+  loadGradebook();    // no filter → show everything
+});
+
+// When you click “Search”, pass the box’s value as filter
+document.getElementById('gradeSearchBtn').addEventListener('click', () => {
+  const term = document.getElementById('gradeSearch').value.trim();
+  loadGradebook(term);
+});
+
 
 
 // BATCH GRADING (AI)

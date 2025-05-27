@@ -385,3 +385,12 @@ thead {
     padding: 1.5rem;
   }
 }
+
+.file-group.search-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.file-group.search-group input {
+  flex: 1;
+}
