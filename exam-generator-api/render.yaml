@@ -7,5 +7,4 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.10
-      - key: UPSTAGE_API_KEY
-        value: up_0xiZGIC9T6of93SeqWgJjTpirVr2n
+
