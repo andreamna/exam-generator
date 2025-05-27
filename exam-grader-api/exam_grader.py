@@ -3,13 +3,16 @@ import json
 import requests
 import re
 from bs4 import BeautifulSoup
-from openai import OpenAI
 
 # ---- API Configuration ---- #
-API_KEY = "up_0xiZGIC9T6of93SeqWgJjTpirVr2n"
+API_KEY = os.getenv("UPSTAGE_API_KEY")
+if not API_KEY:
+    raise ValueError("Missing UPSTAGE_API_KEY environment variable.")
+
 HEADERS = {"Authorization": f"Bearer {API_KEY}"}
 OCR_URL = "https://api.upstage.ai/v1/document-digitization"
 DOC_PARSER_URL = "https://api.upstage.ai/v1/document-digitization"
+from openai import OpenAI
 SOLAR_CLIENT = OpenAI(api_key=API_KEY, base_url="https://api.upstage.ai/v1")
 
 # ---- OCR Function ---- #
