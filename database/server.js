@@ -103,7 +103,7 @@ app.use(session({
 
 // Serve static front-end & uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // --- Signup ---
 app.post('/signup', (req, res) => {

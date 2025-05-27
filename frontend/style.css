@@ -1,162 +1,387 @@
-/* Reset & Base */
-* { box-sizing:border-box; margin:0; padding:0 }
+/* —— Reset & Base —— */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html, body {
+  height: 100%;
+}
 body {
   font-family: system-ui, sans-serif;
-  background:#f0f4f8; color:#333;
+  background: #e8edf2;
+  color: #333;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Header */
+/* —— Header —— */
 .header {
-  position:fixed; top:0; left:0; right:0; height:60px;
-  background:#fff; display:flex; align-items:center;
-  justify-content:space-between; padding:0 1rem;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1); z-index:1000;
+  position: fixed;
+  top: 0; left: 0; right: 0; height: 70px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
 }
-.logo { height:40px }
+.logo {
+  height: 50px;
+}
+nav a {
+  font-size: 1.1rem;
+  margin-left: 1.5rem;
+}
 .home-link {
-  color:#5c4ee5; text-decoration:none; font-weight:600;
-  margin-left:1rem;
+  color: #5c4ee5;
+  text-decoration: none;
+  font-weight: 700;
 }
-.home-link:hover { text-decoration:underline }
+.home-link:hover {
+  text-decoration: underline;
+}
 
-/* Hamburger button */
+/* —— Hamburger button —— */
 .hamburger {
-  display:flex; flex-direction:column; justify-content:space-around;
-  width:24px; height:24px; background:transparent; border:none;
-  cursor:pointer; padding:0; margin-right:1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 28px; height: 28px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 1rem;
 }
 .hamburger span {
-  width:100%; height:2px; background:#333; border-radius:2px;
+  width: 100%;
+  height: 3px;
+  background: #333;
+  border-radius: 2px;
 }
 
-/* Slide-out menu */
+/* —— Slide-out menu —— */
 .side-menu {
-  position:fixed; top:60px; left:0; bottom:0; width:200px;
-  background:#fff; box-shadow:2px 0 8px rgba(0,0,0,0.1);
-  padding:1rem; z-index:999; transform:translateX(-100%);
-  transition:transform 0.3s ease;
+  position: fixed;
+  top: 70px; left: 0; bottom: 0; width: 240px;
+  background: #fafafa;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  z-index: 999;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
 }
-.side-menu.open { transform:translateX(0); }
-.side-menu ul { list-style:none; padding:0 }
-.side-menu li { margin-bottom:1rem }
+.side-menu.open {
+  transform: translateX(0);
+}
+.side-menu ul {
+  list-style: none;
+  padding: 0;
+}
+.side-menu li {
+  margin-bottom: 1.5rem;
+}
+.side-menu strong#menuUser {
+  display: block;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
 .side-menu a {
-  color:#5c4ee5; text-decoration:none; font-weight:500;
+  display: block;
+  font-size: 1.15rem;
+  color: #5c4ee5;
+  text-decoration: none;
+  font-weight: 600;
 }
-.side-menu a:hover { text-decoration:underline }
+.side-menu a:hover {
+  text-decoration: underline;
+}
 
-/* Main & Views */
-.main { padding-top:60px }
+/* —— Main & Views —— */
+.main {
+  padding-top: 70px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 .view {
-  max-width:600px; margin:2rem auto; background:#fff;
-  padding:2rem; border-radius:12px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.1);
+  flex: 1;
+  width: 90%;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
 }
-.hidden { display:none }
+.hidden {
+  display: none;
+}
 
-/* Headings */
-h1 { text-align:center; margin-bottom:1.5rem; font-size:1.75rem }
+/* —— Home view special styling —— */
+#home.view {
+  height: calc(100vh - 70px);
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #eef2f7 0%, #dde4ec 100%);
+  align-items: center;
+  justify-content: center;
+}
+#home h1 {
+  font-size: 3rem;
+  margin-bottom: 2.5rem;
+  color: #333;
+}
+#home .home-buttons {
+  display: flex;
+  gap: 2rem;
+}
+#home .btn {
+  padding: 1.25rem 3rem;
+  font-size: 1.25rem;
+  border-radius: 12px;
+  margin: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
-/* File-group & Inputs */
-.file-group { margin-bottom:1rem }
+/* —— Card styling for other views —— */
+.view:not(#home) {
+  max-width: 900px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  padding: 2.5rem;
+  min-height: calc(100vh - 70px);
+  align-items: stretch;
+}
+
+/* —— Headings —— */
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #333;
+}
+
+/* —— File-group & Inputs —— */
+.file-group {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
 .file-group label {
-  display:block; font-weight:600; margin-bottom:0.5rem;
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  font-size: 1.05rem;
 }
 input, select, textarea {
-  width:100%; padding:0.5rem;
-  border:1px solid #cbd5e1; border-radius:4px;
-  font-size:1rem; margin-bottom:0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-/* Switch links */
+/* —— Switch links —— */
 .switch-link {
-  text-align:center; margin-top:1rem;
+  text-align: center;
+  margin-top: 1.5rem;
 }
-.switch-link a { color:#5c4ee5; text-decoration:none; }
-.switch-link a:hover { text-decoration:underline; }
+.switch-link a {
+  color: #5c4ee5;
+  text-decoration: none;
+  font-weight: 600;
+}
+.switch-link a:hover {
+  text-decoration: underline;
+}
 
-/* Drop-zone */
+/* —— Drop-zone —— */
 .drop-zone {
-  position:relative; padding:1rem;
-  border:2px dashed #cbd5e1; border-radius:8px;
-  background:#f8fafc; text-align:center; cursor:pointer;
-  transition:border-color 0.2s, background 0.2s;
+  position: relative;
+  padding: 1.25rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
 }
 .drop-zone input {
-  position:absolute; top:0; left:0; right:0; bottom:0;
-  width:100%; height:100%; opacity:0; cursor:pointer;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 .drop-zone.dragover {
-  border-color:#4a3ccf; background:#ebefff;
+  border-color: #4a3ccf;
+  background: #ebefff;
 }
 
-/* File list */
+/* —— File list —— */
 .file-list {
-  margin-top:0.5rem; list-style:none; padding:0;
-  font-size:0.9rem; color:#555;
+  margin-top: 0.75rem;
+  list-style: none;
+  padding: 0;
+  font-size: 0.95rem;
+  color: #555;
 }
-.file-list li { margin-bottom:0.25rem }
+.file-list li {
+  margin-bottom: 0.5rem;
+}
 
-/* Question Counts */
-.type-count { margin-bottom:1.5rem }
+/* —— Question Counts —— */
+.type-count {
+  margin-bottom: 2rem;
+}
 .type-count h2 {
-  font-size:1.125rem; margin-bottom:0.75rem; font-weight:600;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
 }
 .type-count label {
-  display:flex; align-items:center; margin-bottom:0.5rem;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
 }
 .type-count input {
-  margin-left:auto; width:4rem; padding:0.25rem;
-  border:1px solid #cbd5e1; border-radius:4px;
+  margin-left: auto;
+  width: 5rem;
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
 }
 
-/* Questions Container */
-.questions-container { margin-bottom:2rem }
-.question-line {
-  display:flex; align-items:center; gap:0.5rem;
-  padding:0.5rem; border:1px solid #e2e8f0;
-  border-radius:6px; background:#f9fafb;
-  margin-bottom:1rem; cursor:move;
+/* —— Questions Container —— */
+.questions-container {
+  margin-bottom: 2.5rem;
 }
-.question-line.dragging { opacity:0.5 }
-.question-line span:first-child { width:2rem; font-weight:600 }
+.question-line {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f9fafb;
+  margin-bottom: 1rem;
+  cursor: move;
+}
+.question-line.dragging {
+  opacity: 0.6;
+}
+.question-line span:first-child {
+  width: 2.5rem;
+  font-weight: 700;
+}
 .blank-line {
-  flex:1; border-bottom:1px solid #ccc; height:0;
+  flex: 1;
+  border-bottom: 1px solid #ccc;
+  height: 0;
 }
 .remove-btn {
-  background:none; border:none; color:#dc2626;
-  cursor:pointer; font-size:0.875rem;
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 1rem;
 }
 
-/* Buttons */
+/* —— Buttons —— */
 .btn {
-  background:#5c4ee5; color:#fff; border:none;
-  padding:0.75rem 1rem; border-radius:8px;
-  cursor:pointer; transition:background 0.2s;
+  background: #5c4ee5;
+  color: #fff;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  font-size: 1rem;
 }
-.btn:hover { background:#4a3ccf }
+.btn:hover {
+  background: #4a3ccf;
+  transform: translateY(-2px);
+}
 .btn.small {
-  padding:0.5rem 0.75rem; font-size:0.875rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
 }
 
-/* Home Buttons */
+/* —— Home Buttons —— */
 .home-buttons {
-  display:flex; gap:1rem; justify-content:center;
-  margin-top:2rem;
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2.5rem;
 }
 
-/* Grade Result */
-#result {
-  margin-top:1rem; background:#f1f5f9; padding:1rem;
-  border-radius:8px; font-family:monospace;
-  font-size:0.9rem; height:120px; overflow-y:auto;
+/* —— Tables (Gradebook & Results) —— */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+}
+th, td {
+  border: 1px solid #e2e8f0;
+  padding: 0.85rem;
+  text-align: center;
+}
+thead {
+  background: #f1f5f9;
+  font-weight: 600;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  .view { margin:1rem; padding:1rem }
-  .drop-zone { padding:0.5rem }
-  .btn { width:100% }
-  .home-buttons { flex-direction:column }
+/* —— Personal Info Form —— */
+#personalForm .file-group {
+  margin-bottom: 1.5rem;
 }
 
-.hidden { display: none; }
+/* —— Spinner —— */
+#spinner {
+  display: block;
+  margin: 2rem auto;
+  width: 36px;
+  height: 36px;
+  border: 4px solid #ccc;
+  border-top-color: #5c4ee5;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* —— Responsive —— */
+@media (max-width: 768px) {
+  #home h1 {
+    font-size: 2.5rem;
+  }
+  #home .btn {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+  .side-menu {
+    width: 200px;
+    padding: 1rem;
+  }
+  .side-menu a {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 480px) {
+  #home .home-buttons {
+    flex-direction: column;
+  }
+  .home-buttons .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+  .view:not(#home) {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+}

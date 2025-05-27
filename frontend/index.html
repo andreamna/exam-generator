@@ -5,15 +5,25 @@
   <title>Exam Marking System</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link href="style.css" rel="stylesheet" />
+
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- List.js for sorting/filtering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 </head>
 <body>
+
+  <!-- Global Loading Spinner -->
+  <div id="spinner" class="hidden">
+    <div class="spinner"></div>
+  </div>
 
   <!-- Fixed Header -->
   <header class="header">
     <button id="hamburgerBtn" class="hamburger" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
-    <img src="pnu.png" alt="PNU Logo" class="logo">
+    <img src="pnu.png" alt="PNU Logo" class="logo" />
     <nav>
       <a href="#" data-view="home" class="home-link">Home</a>
       <a href="#" id="logoutLink" class="home-link hidden">Logout</a>
@@ -26,8 +36,8 @@
       <li><strong id="menuUser">Guest</strong></li>
       <li><a href="#" id="menuLogin">Login</a></li>
       <li><a href="#" id="menuSignup">Sign Up</a></li>
-      <li><a href="#" data-view="lectures" class="menu-link">Lecture Library</a></li>
-      <li><a href="#" data-view="previous" class="menu-link">Gradebook</a></li>
+      <li><a href="#" data-view="personal" class="menu-link hidden">Personal Info</a></li>
+      <li><a href="#" data-view="previous" class="menu-link hidden">Gradebook</a></li>
       <li><a href="#" id="menuLogout" class="hidden">Logout</a></li>
     </ul>
   </aside>
@@ -39,11 +49,11 @@
       <h1>Login</h1>
       <div class="file-group">
         <label for="loginId">ID</label>
-        <input type="text" id="loginId" placeholder="Enter your ID">
+        <input autocomplete="off" type="text" id="loginId" placeholder="Enter your ID">
       </div>
       <div class="file-group">
         <label for="loginPassword">Password</label>
-        <input type="password" id="loginPassword" placeholder="Enter your password">
+        <input autocomplete="new-password" type="password" id="loginPassword" placeholder="Enter your password">
       </div>
       <button id="loginBtn" class="btn">Login</button>
       <p class="switch-link">
@@ -81,18 +91,28 @@
     <section id="home" class="view">
       <h1>Exam Marking System</h1>
       <div class="home-buttons">
-        <button data-view="create" class="btn">Create Exam Template</button>
-        <button data-view="grade"  class="btn">Grade Exams</button>
+        <button data-view="create" class="btn primary-btn">Create Exam Template</button>
+        <button data-view="grade" class="btn accent-btn">Grade Exams</button>
       </div>
+    </section>
+
+    <!-- PERSONAL INFO -->
+    <section id="personal" class="view hidden">
+      <button class="back btn small">&larr; Go Back</button>
+      <h1>My Profile</h1>
+      <div class="file-group"><strong>ID:</strong> <span id="profileId">—</span></div>
+      <div class="file-group"><strong>Name:</strong> <span id="profileNameDisplay">—</span></div>
+      <div class="file-group"><strong>Email:</strong> <span id="profileEmailDisplay">—</span></div>
     </section>
 
     <!-- CREATE -->
     <section id="create" class="view hidden">
+      <button class="back btn small">&larr; Go Back</button>
       <h1>Create Exam Template</h1>
       <div class="file-group">
         <label>Upload Lecture Materials</label>
         <div id="materialsDrop" class="drop-zone">
-          <span>Drag & Drop files here or click to select</span>
+          <span>Drag &amp; Drop files here or click to select</span>
           <input id="materialsInput" type="file" multiple>
         </div>
         <ul id="materialsList" class="file-list"></ul>
@@ -104,12 +124,13 @@
         <label>Short Answer:<input id="count-short" type="number" min="0" value="0"></label>
         <label>Numerical:<input id="count-numeric" type="number" min="0" value="0"></label>
       </div>
-      <button id="genExamBtn" data-view="preview" class="btn">Generate Exam</button>
+      <button id="genExamBtn" class="btn">Generate Exam</button>
     </section>
 
     <!-- PREVIEW -->
     <section id="preview" class="view hidden">
-      <h1>Exam Template</h1>
+      <button class="back btn small">&larr; Go Back</button>
+      <h1>Exam Template Preview</h1>
       <div id="questionsContainer" class="questions-container"></div>
       <div class="file-group">
         <label>New Question</label>
@@ -125,7 +146,7 @@
         </select>
         <div class="btn-group">
           <button id="insertDirect" class="btn small">Insert Directly</button>
-          <button id="insertAI"     class="btn small">Let AI Do It</button>
+          <button id="insertAI" class="btn small">Let AI Do It</button>
         </div>
       </div>
       <div class="home-buttons">
@@ -136,86 +157,75 @@
 
     <!-- GRADE -->
     <section id="grade" class="view hidden">
+      <button class="back btn small">&larr; Go Back</button>
       <h1>Grade Exams</h1>
-
-      <!-- Exam name/code input -->
       <div class="file-group">
         <label for="examCodeInput">Exam Name / Code</label>
         <input type="text" id="examCodeInput" placeholder="e.g. CS101-Midterm">
       </div>
-
       <div class="file-group">
         <label>1. Upload Exam Template</label>
         <div id="templateDrop" class="drop-zone">
-          <span>Drag & Drop or click</span>
-          <input id="templateInput" type="file" accept=".pdf,.ppt,.png,.jpg">
+          <span>Drag &amp; Drop or click</span>
+          <input id="templateInput" name="template" type="file" accept=".pdf,.ppt,.png,.jpg">
         </div>
         <ul id="templateList" class="file-list"></ul>
       </div>
-
       <div class="file-group">
-        <label>2. Upload the Answer Key</label>
+        <label>2. Upload Answer Key</label>
         <div id="answerKeyDrop" class="drop-zone">
-          <span>Drag & Drop or click</span>
-          <input id="answerKeyInput" type="file" accept=".pdf,.ppt,.png,.jpg">
+          <span>Drag &amp; Drop or click</span>
+          <input id="answerKeyInput" name="answerKey" type="file" accept=".pdf,.ppt,.png,.jpg">
         </div>
         <ul id="answerKeyList" class="file-list"></ul>
       </div>
-
       <div class="file-group">
         <label>3. Upload Student Papers (multiple)</label>
         <div id="studentDrop" class="drop-zone">
-          <span>Drag & Drop or click</span>
-<<<<<<< HEAD
-          <input id="studentInput" type="file" name="documents" accept=".pdf,.jpg,.png" multiple>
-=======
-          <input id="studentInput" type="file" accept=".pdf,.jpg,.png" multiple>
->>>>>>> dab05dd (frontend+database)
+          <span>Drag &amp; Drop or click</span>
+          <input id="studentInput" name="studentPapers" type="file" accept=".pdf,.jpg,.png" multiple>
         </div>
         <ul id="studentList" class="file-list"></ul>
       </div>
-
       <button id="gradeBatchBtn" class="btn">Grade All with AI</button>
 
-<!-- initially hidden -->
-<div id="resultsSection" class="hidden">
-  <h2>Results</h2>
-  <table id="batchResults" class="file-list">
-    <thead>
-      <tr>
-        <th>Student ID</th>
-        <th>Name</th>
-        <th>Score</th>
-        <th>Download</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
-
+      <div id="resultsSection" class="hidden">
+        <h2>Results</h2>
+        <table id="batchResults" class="file-list">
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Name</th>
+              <th>Score</th>
+              <th>Download</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </section>
 
     <!-- GRADEBOOK -->
     <section id="previous" class="view hidden">
+      <button class="back btn small">&larr; Go Back</button>
       <h1>Gradebook</h1>
+      <p>Enter the exam name/code:</p>
+      <div class="file-group">
+        <input class="search" id="gradeSearch" placeholder="Search…">
+      </div>
       <table id="gradebookTable" class="file-list">
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Exam</th>
-            <th>Student ID</th>
-            <th>Name</th>
-            <th>Score</th>
+            <th class="sort" data-sort="date">Date</th>
+            <th class="sort" data-sort="exam">Exam</th>
+            <th class="sort" data-sort="studentid">Student ID</th>
+            <th class="sort" data-sort="studentname">Name</th>
+            <th class="sort" data-sort="score">Score</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody class="list grade-list"></tbody>
       </table>
-    </section>
-
-    <!-- LECTURE LIBRARY -->
-    <section id="lectures" class="view hidden">
-      <h1>Lecture Library</h1>
-      <ul id="lecturesList" class="file-list"></ul>
+      <button id="exportExcelBtn" class="btn small">Download</button>
     </section>
 
   </main>

@@ -3,10 +3,24 @@ function showView(id) {
   document.querySelectorAll('.view')
     .forEach(sec => sec.classList.toggle('hidden', sec.id !== id));
 }
+
+// Reset login form fields
+function resetLoginForm() {
+  document.getElementById('loginId').value = '';
+  document.getElementById('loginPassword').value = '';
+}
+
+// “Go Back” buttons
+document.querySelectorAll('.back').forEach(btn =>
+  btn.addEventListener('click', () => showView('home'))
+);
+
+// Init navigation buttons
 document.querySelectorAll('[data-view]').forEach(btn =>
   btn.addEventListener('click', () => showView(btn.dataset.view))
 );
-// INITIAL
+
+// Start on home
 showView('home');
 
 
@@ -33,10 +47,9 @@ function setupDropZone(z, i, l) {
   });
   inp.addEventListener('change', refresh);
 }
-setupDropZone('materialsDrop','materialsInput','materialsList');
-setupDropZone('templateDrop','templateInput','templateList');
-setupDropZone('answerKeyDrop','answerKeyInput','answerKeyList');
-setupDropZone('studentDrop','studentInput','studentList');
+['materials','template','answerKey','student'].forEach(pref =>
+  setupDropZone(pref + 'Drop', pref + 'Input', pref + 'List')
+);
 
 
 // GENERATE → PREVIEW
@@ -64,7 +77,6 @@ document.getElementById('genExamBtn').onclick = () => {
   showView('preview');
 };
 
-
 // REORDER & REMOVE
 const cont = document.getElementById('questionsContainer');
 let dragSrc = null;
@@ -88,8 +100,6 @@ cont.addEventListener('click', e => {
     e.target.closest('.question-line').remove();
     renumber();
   }
-  resultArea.textContent = 'Grading in progress…';
-  uploadFiles();
 });
 function renumber(){
   Array.from(cont.children).forEach((ln,i) => {
@@ -97,15 +107,13 @@ function renumber(){
   });
 }
 
-
 // INSERT DIRECTLY & AI STUB
 document.getElementById('insertDirect').onclick = () => {
   const q = document.getElementById('newQuestion').value.trim();
   if (!q) return alert('Enter a question.');
   const idx = cont.children.length + 1;
   const d = document.createElement('div');
-  d.className = 'question-line';
-  d.draggable = true;
+  d.className = 'question-line'; d.draggable = true;
   d.innerHTML = `<span>${idx}.</span><span>${q}</span><button class="remove-btn">Remove</button>`;
   cont.appendChild(d);
   document.getElementById('newQuestion').value = '';
@@ -114,38 +122,7 @@ document.getElementById('insertDirect').onclick = () => {
 document.getElementById('insertAI').onclick =
   () => document.getElementById('insertDirect').click();
 
-<<<<<<< HEAD
-hamburgerBtn.addEventListener('click', () => {
-  const isVisible = mobileMenu.style.display === 'flex';
-  mobileMenu.style.display = isVisible ? 'none' : 'flex';
-});
-
-//Function to upload files to the backend server
-function uploadFiles(){
-  const input = document.getElementById("studentInput");
-  const files = input.files;
-
-  const formData = new FormData();
-  for(let i = 0; i<files.length; i++){
-    formData.append('documents', files[i]);
-  }
-
-  fetch('/uploads', {
-    method: 'POST',
-    body: formData
-  })
-  .then(res => {
-    if (!res.ok) throw new Error("Upload failed");
-  })
-  .catch(err => {
-    console.error("Upload error:", err.message);
-  })
-}
-// Download Exam as PDF
-=======
-
 // DOWNLOAD EXAM PDF
->>>>>>> dab05dd (frontend+database)
 document.getElementById('downloadExam').onclick = () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -156,14 +133,13 @@ document.getElementById('downloadExam').onclick = () => {
   doc.save('exam_template.pdf');
 };
 
-
 // STUB ANSWER KEY
 document.getElementById('downloadKey').onclick =
   () => alert('Answer key download not implemented');
 
 
 // HAMBURGER MENU
-const ham = document.getElementById('hamburgerBtn'),
+const ham  = document.getElementById('hamburgerBtn'),
       side = document.getElementById('sideMenu');
 ham.addEventListener('click', () => side.classList.toggle('open'));
 side.querySelectorAll('a').forEach(a =>
@@ -173,14 +149,18 @@ side.querySelectorAll('a').forEach(a =>
 
 // AUTH & MENU STATE
 async function updateMenu(user){
-  document.getElementById('menuUser').textContent = user ? user.name : 'Guest';
+  document.getElementById('menuUser').textContent    = user ? user.name : 'Guest';
   document.getElementById('menuLogin').classList.toggle('hidden', !!user);
   document.getElementById('menuSignup').classList.toggle('hidden', !!user);
   document.getElementById('menuLogout').classList.toggle('hidden', !user);
   document.getElementById('logoutLink').classList.toggle('hidden', !user);
+  // show personal & gradebook only when logged in
+  document.querySelectorAll('.menu-link').forEach(el =>
+    el.classList.toggle('hidden', !user)
+  );
 }
 async function checkAuth(){
-  const res = await fetch('/auth-status'),
+  const res     = await fetch('/auth-status'),
         { user } = await res.json();
   updateMenu(user);
 }
@@ -188,13 +168,25 @@ window.addEventListener('load', checkAuth);
 
 
 // LOGIN & SIGNUP
-document.getElementById('menuLogin').onclick = e => { e.preventDefault(); showView('login'); };
-document.getElementById('toSignup').onclick  = e => { e.preventDefault(); showView('signup'); };
-document.getElementById('menuSignup').onclick= e => { e.preventDefault(); showView('signup'); };
+document.getElementById('menuLogin').onclick = e => {
+  e.preventDefault();
+  resetLoginForm();
+  showView('login');
+};
+document.getElementById('toSignup').onclick = e => {
+  e.preventDefault();
+  resetLoginForm();
+  showView('signup');
+};
+document.getElementById('menuSignup').onclick = e => {
+  e.preventDefault();
+  resetLoginForm();
+  showView('signup');
+};
 
 document.getElementById('loginBtn').onclick = async () => {
-  const id  = document.getElementById('loginId').value.trim(),
-        pw  = document.getElementById('loginPassword').value;
+  const id = document.getElementById('loginId').value.trim(),
+        pw = document.getElementById('loginPassword').value;
   const res = await fetch('/login', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -204,91 +196,86 @@ document.getElementById('loginBtn').onclick = async () => {
     await checkAuth();
     showView('home');
   } else {
-    const { error } = await res.json();
-    alert('Login failed: ' + error);
+    alert('Login failed: ' + (await res.json()).error);
   }
 };
 
 document.getElementById('signupBtn').onclick = async () => {
-  const id      = document.getElementById('signupId').value.trim(),
-        name    = document.getElementById('signupName').value.trim(),
-        email   = document.getElementById('signupEmail').value.trim(),
-        password= document.getElementById('signupPassword').value,
-        confirm = document.getElementById('signupConfirm').value;
+  const payload = {
+    id:      document.getElementById('signupId').value.trim(),
+    name:    document.getElementById('signupName').value.trim(),
+    email:   document.getElementById('signupEmail').value.trim(),
+    password:document.getElementById('signupPassword').value,
+    confirm: document.getElementById('signupConfirm').value
+  };
   const res = await fetch('/signup', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ id, name, email, password, confirm })
+    body:JSON.stringify(payload)
   });
-  const data = await res.json();
   if (res.ok) {
     alert('Account created! Please log in.');
+    resetLoginForm();
     showView('login');
   } else {
-    alert('Sign up error: ' + data.error);
+    alert('Sign up error: ' + (await res.json()).error);
   }
 };
 
-
-// LOGOUT
-document.getElementById('logoutLink').onclick = async () => {
-  await fetch('/logout');
-  await checkAuth();
-  showView('home');
-};
+// LOGOUT (same handler for header & menu)
+document.getElementById('logoutLink').onclick =
 document.getElementById('menuLogout').onclick = async () => {
   await fetch('/logout');
   await checkAuth();
-  showView('home');
+  resetLoginForm();
+  showView('login');
 };
 
 
-// LECTURE LIBRARY
-async function loadLectures() {
-  const res = await fetch('/lectures');
-  if (!res.ok) return alert('Failed to load lectures');
-  const lectures = await res.json();
-  const ul = document.getElementById('lecturesList');
-  ul.innerHTML = lectures.map(l =>
-    `<li>
-      ${l.uploadDate.slice(0,10)} — ${l.filename}
-      <a href="/${l.path}" download>Download</a>
-      <button data-id="${l.id}" class="del-lecture">Delete</button>
-    </li>`
-  ).join('');
-  // attach delete buttons
-  document.querySelectorAll('.del-lecture').forEach(btn=>{
-    btn.onclick = async ()=>{
-      const id = btn.dataset.id;
-      await fetch(`/lectures/${id}`, { method:'DELETE' });
-      loadLectures();
-    };
-  });
-}
+// PERSONAL INFO
+document.querySelector('[data-view="personal"]').addEventListener('click', async () => {
+  const res     = await fetch('/auth-status'),
+        { user } = await res.json();
+  if (!user) return;
+  document.getElementById('profileId').textContent           = user.id;
+  document.getElementById('profileNameDisplay').textContent  = user.name;
+  document.getElementById('profileEmailDisplay').textContent = user.email || '—';
+});
+
 
 // GRADEBOOK
+const gradeList = new List('previous', {
+  valueNames: ['date','exam','studentid','studentname','score']
+});
+
 async function loadGradebook() {
   const res = await fetch('/scores');
   if (!res.ok) return alert('Please log in first');
   const grades = await res.json();
-  const tbody = document.querySelector('#gradebookTable tbody');
-  tbody.innerHTML = grades.map(g =>
-    `<tr>
-      <td>${g.date.split('T')[0]}</td>
-      <td>${g.examName||'Exam'}</td>
-      <td>${g.studentId}</td>
-      <td>${g.studentName}</td>
-      <td>${g.score}</td>
-    </tr>`
-  ).join('');
+  gradeList.clear();
+  grades.forEach(g => gradeList.add({
+    date:        g.date.split('T')[0],
+    exam:        g.examName || 'Exam',
+    studentid:   g.studentId,
+    studentname: g.studentName,
+    score:       g.score
+  }));
 }
 
-// MENU LINK HOOKS
+// Download Excel
+document.getElementById('exportExcelBtn').onclick = () => {
+  const data = gradeList.items.map(i => i.values());
+  const ws   = XLSX.utils.json_to_sheet(data);
+  const wb   = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Gradebook');
+  XLSX.writeFile(wb, 'gradebook.xlsx');
+};
+
+// Hook gradebook submenu
 document.querySelectorAll('.menu-link').forEach(btn =>
   btn.addEventListener('click', () => {
     const v = btn.dataset.view;
     showView(v);
-    if (v === 'lectures') loadLectures();
     if (v === 'previous') loadGradebook();
   })
 );
@@ -296,24 +283,32 @@ document.querySelectorAll('.menu-link').forEach(btn =>
 
 // BATCH GRADING (AI)
 document.getElementById('gradeBatchBtn').onclick = async () => {
-  const tpl = document.getElementById('templateInput').files[0];
-  const key = document.getElementById('answerKeyInput').files[0];
+  const tpl  = document.getElementById('templateInput').files[0];
+  const key  = document.getElementById('answerKeyInput').files[0];
   const subs = Array.from(document.getElementById('studentInput').files);
   if (!tpl || !key || !subs.length) {
     return alert('Please upload template, answer key and student papers.');
   }
+
+  // show spinner
+  document.getElementById('spinner').classList.remove('hidden');
+
   const form = new FormData();
   form.append('template', tpl);
   form.append('answerKey', key);
   subs.forEach(f => form.append('studentPapers', f));
 
-  const res = await fetch('/grade-batch', { method:'POST', body: form });
+  const res = await fetch('/grade-batch', { method:'POST', body:form });
+
+  // hide spinner
+  document.getElementById('spinner').classList.add('hidden');
+
   if (!res.ok) {
-    const err = await res.json();
-    return alert('Batch grading error: ' + err.error);
+    alert('Batch grading error: ' + (await res.json()).error);
+    return;
   }
   const results = await res.json();
-  const tbody = document.querySelector('#batchResults tbody');
+  const tbody   = document.querySelector('#batchResults tbody');
   tbody.innerHTML = results.map(r =>
     `<tr>
       <td>${r.studentId}</td>
@@ -322,8 +317,5 @@ document.getElementById('gradeBatchBtn').onclick = async () => {
       <td><a href="${r.paperUrl}" download>Download</a></td>
     </tr>`
   ).join('');
-
-  // **NEW**: reveal the results section now that we have data
   document.getElementById('resultsSection').classList.remove('hidden');
 };
-
