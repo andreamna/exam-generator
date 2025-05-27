@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app"
   },
   "keywords": [],
   "author": "",
@@ -14,8 +15,13 @@
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
+    "fs": "^0.0.1-security",
     "multer": "^2.0.0",
+    "path": "^0.12.7",
+    "pdf-lib": "^1.17.1",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
-

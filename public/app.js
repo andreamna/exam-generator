@@ -41,7 +41,7 @@ function setupDropZone(z, i, l) {
 
   zone.addEventListener('dragover', e => { 
     e.preventDefault(); 
-    zone.classList.add('dragover');
+    one.classList.add('dragover');
   });
   zone.addEventListener('dragleave', () => {
     zone.classList.remove('dragover');
@@ -203,42 +203,35 @@ document.getElementById('menuSignup').onclick = e => {
 document.getElementById('loginBtn').onclick = async () => {
   const id = document.getElementById('loginId').value.trim(),
         pw = document.getElementById('loginPassword').value;
-  const res = await fetch('/login', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ id, password: pw })
+  const res = await fetch('http://localhost:3000/login', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id: id, password: pw })
   });
-  if (res.ok) {
-    // successful login → update menu & go home
-    await checkAuth();
-    showView('home');
-  } else {
-    const err = await res.json();
-    alert('Login failed: ' + err.error);
+  if (res == "Not found"){
+    //Handle logic
   }
 };
-
 
 document.getElementById('signupBtn').onclick = async () => {
-  const id      = document.getElementById('signupId').value.trim(),
-        name    = document.getElementById('signupName').value.trim(),
-        password= document.getElementById('signupPassword').value,
-        confirm = document.getElementById('signupConfirm').value;
-  const res = await fetch('/signup', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ id, name, password, confirm })
-  });
-  if (res.ok) {
-    alert('Account created! Please log in.');
-    resetLoginForm();
-    showView('login');
-  } else {
-    const err = await res.json();
-    alert('Sign up error: ' + err.error);
-  }
-};
+  const payload = {
+    id:      document.getElementById('signupId').value.trim(),
+    name:    document.getElementById('signupName').value.trim(),
+    email:   document.getElementById('signupEmail').value.trim(),
+    password:document.getElementById('signupPassword').value,
+    confirm: document.getElementById('signupConfirm').value
+  };
 
+  fetch("http://localhost:3000/users", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({id: payload.id, name: payload.name, email: payload.email, password: payload.password})
+  })
+  .then(res => res.text())
+  .then(data => console.log(data));
+};
 
 // LOGOUT (same handler for header & menu)
 document.getElementById('logoutLink').onclick =
@@ -248,9 +241,6 @@ document.getElementById('menuLogout').onclick = async () => {
   resetLoginForm();
   showView('login');
 };
-
-
-
 
 
 async function loadGradebook() {
@@ -277,94 +267,46 @@ document.querySelector('[data-view="previous"]').addEventListener('click', () =>
 });
 
 
-
-
-/*
-// GRADEBOOK
-async function loadGradebook(filter = '') {
-  const res = await fetch('/scores');
-  if (!res.ok) return alert('Please log in first');
-
-  const grades = await res.json();
-  // if a filter term is provided, only keep matching examNames
-  const filtered = filter
-    ? grades.filter(g =>
-        g.examName.toLowerCase().includes(filter.toLowerCase())
-      )
-    : grades;
-
-  const tbody = document.querySelector('#gradebookTable tbody');
-  tbody.innerHTML = filtered.map(g => `
-    <tr>
-      <td>${g.date.split('T')[0]}</td>
-      <td>${g.examName || 'Exam'}</td>
-      <td>${g.studentId}</td>
-      <td>${g.studentName}</td>
-      <td>${g.score}</td>
-    </tr>
-  `).join('');
-}*/
-
-// When you click the “Gradebook” menu item, load them all
-document.querySelector('[data-view="previous"]').addEventListener('click', () => {
-  showView('previous');
-  loadGradebook();    // no filter → show everything
-});
-
-// When you click “Search”, pass the box’s value as filter
-document.getElementById('gradeSearchBtn').addEventListener('click', () => {
-  const term = document.getElementById('gradeSearch').value.trim();
-  loadGradebook(term);
-});
-
-
-
 // BATCH GRADING (AI)
 document.getElementById('gradeBatchBtn').onclick = async () => {
+  console.log("Hello");
+  uploadGrading();
+  /*const tpl  = document.getElementById('templateInput').files[0];
+  const key  = document.getElementById('answerKeyInput').files[0];
+  const subs = Array.from(document.getElementById('studentInput').files);
+  if (!tpl || !key || !subs.length) {
+    return alert('Please upload template, answer key and student papers.');
+  }
+
   // show spinner
   document.getElementById('spinner').classList.remove('hidden');
 
-  const examName = document.getElementById('examCodeInput').value.trim();
-  const tpl  = document.getElementById('templateInput').files[0];
-  const key  = document.getElementById('answerKeyInput').files[0];
-  const subs = Array.from(document.getElementById('studentInput').files);
-
-  if (!examName) {
-    alert('Please enter the exam name/code.');
-    return;
-  }
-  if (!tpl || !key || !subs.length) {
-    alert('Please upload template, answer key and student papers.');
-    return;
-  }
-
   const form = new FormData();
-  form.append('examName', examName);
   form.append('template', tpl);
   form.append('answerKey', key);
   subs.forEach(f => form.append('studentPapers', f));
 
-  try {
-    const res = await fetch('/grade-batch', { method: 'POST', body: form });
-    document.getElementById('spinner').classList.add('hidden');
-    if (!res.ok) throw new Error((await res.json()).error || res.statusText);
-    const results = await res.json();
-    const tbody   = document.querySelector('#batchResults tbody');
-    tbody.innerHTML = results.map(r => `
-      <tr>
-        <td>${r.studentId}</td>
-        <td>${r.studentName}</td>
-        <td>${r.score}</td>
-        <td><a href="${r.paperUrl}" download>Download</a></td>
-      </tr>
-    `).join('');
-    document.getElementById('resultsSection').classList.remove('hidden');
-  } catch (e) {
-    document.getElementById('spinner').classList.add('hidden');
-    alert('Batch grading failed: ' + e.message);
-  }
-};
+  const res = await fetch('/grade-batch', { method:'POST', body:form });
 
+  // hide spinner
+  document.getElementById('spinner').classList.add('hidden');
+
+  if (!res.ok) {
+    alert('Batch grading error: ' + (await res.json()).error);
+    return;
+  }
+  const results = await res.json();
+  const tbody   = document.querySelector('#batchResults tbody');
+  tbody.innerHTML = results.map(r =>
+    `<tr>
+      <td>${r.studentId}</td>
+      <td>${r.studentName}</td>
+      <td>${r.score}</td>
+      <td><a href="${r.paperUrl}" download>Download</a></td>
+    </tr>`
+  ).join('');
+  document.getElementById('resultsSection').classList.remove('hidden');*/
+};
 
 
 //My own functions
