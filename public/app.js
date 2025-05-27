@@ -1,5 +1,3 @@
-
-
 // VIEW SWITCHING
 function showView(id) {
   document.querySelectorAll('.view')

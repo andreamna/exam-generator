@@ -122,7 +122,7 @@ nav a {
   height: calc(100vh - 70px);
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #eef2f7 0%, #dde4ec 100%);
+  background: none;
   align-items: center;
   justify-content: center;
 }
@@ -384,4 +384,26 @@ thead {
     margin: 1rem;
     padding: 1.5rem;
   }
+}
+
+.file-group.search-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.file-group.search-group input {
+  flex: 1;
+}
+/* Home‐only full‐screen blurred background */
+#home {
+  position: relative;
+  overflow: hidden;
+}
+#home::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("bg.png") center center / cover no-repeat;
+  filter: blur(8px);
+  z-index: -1;
 }
