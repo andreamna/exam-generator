@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exam Marking System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-left">
+      <img src="pnu.png" alt="Logo" class="logo">
+      <a href="#" class="nav-link">Home</a>
+    </div>
+
+    <div class="nav-center">
+      <input type="text" placeholder="Search..." class="nav-search">
+    </div>
+
+    <div class="nav-right">
+      <button class="icon-btn" title="Notifications">🔔</button>
+      <button class="icon-btn" title="User Menu">👤</button>
+      <button class="hamburger" id="hamburgerBtn">☰</button>
+    </div>
+
+    <!-- Mobile dropdown -->
+    <nav class="mobile-menu" id="mobileMenu">
+      <a href="#" class="mobile-link">Home</a>
+      <a href="#upload" class="mobile-link">Upload</a>
+      <a href="#grade" class="mobile-link">Grade</a>
+      <a href="#reports" class="mobile-link">Reports</a>
+      <a href="#settings" class="mobile-link">Settings</a>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <section id="upload">
+      <h1>Exam Marking System</h1>
+      <div class="file-group">
+        <label for="templateInput">1. Upload Exam Template</label>
+        <input id="templateInput" type="file" accept=".pdf,.ppt,.png,.jpg">
+      </div>
+      <div class="file-group">
+        <label for="studentInput">2. Upload Student Paper</label>
+        <input id="studentInput" type="file" accept=".pdf,.jpg,.png">
+      </div>
+      <button id="gradeBtn" class="btn">Grade</button>
+      <pre id="result"></pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
