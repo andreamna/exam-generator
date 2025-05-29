@@ -18,13 +18,13 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 async def generate_exam(
     files: List[UploadFile] = File(...),
     detail_level: str = Form("medium"),
-    question_counts: str = Form(...)  # JSON string mapping each file to its question counts
+    question_counts: str = Form(...)  # JSON string mapping original filenames to question counts
 ):
     file_paths = []
     filename_to_saved_path = {}
 
     try:
-        # Parse question_counts JSON string
+        # Parse question_counts JSON string (original filenames as keys)
         question_settings_raw = json.loads(question_counts)
     except json.JSONDecodeError:
         return JSONResponse(content={"error": "Invalid JSON format in question_counts"}, status_code=400)
@@ -43,19 +43,23 @@ async def generate_exam(
         parsed_data = parse_multiple_pdfs(file_paths)
         summaries = summarize_from_json_input(parsed_data, detail_level=detail_level)
 
-        # Step 2: Map upload_number to question counts
-        upload_filename_map = {
-            os.path.basename(path): summary["upload_number"]
-            for path, summary in zip(file_paths, summaries["summaries"])
-        }
+        # Step 2: Map original filenames to upload_number by stripping UUID prefix
+        filename_to_upload_number = {}
+        for path, summary in zip(file_paths, summaries["summaries"]):
+            saved_filename = os.path.basename(path)  # e.g. "c4a9e25b-e39f-4c49-a386-dc2c9378ea27_Week6.pdf"
+            # Extract original filename after the first underscore
+            original_filename = saved_filename.split("_", 1)[1] if "_" in saved_filename else saved_filename
+            upload_num = summary["upload_number"]
+            filename_to_upload_number[original_filename] = upload_num
 
+        # Step 3: Build question_settings keyed by upload_number
         question_settings = {}
         for original_filename, settings in question_settings_raw.items():
-            upload_number = upload_filename_map.get(original_filename)
+            upload_number = filename_to_upload_number.get(original_filename)
             if upload_number:
                 question_settings[upload_number] = settings
 
-        # Step 3: Generate exam questions
+        # Step 4: Generate exam questions
         question_data = interactive_question_generation(summaries, question_settings)
 
         return JSONResponse(content=question_data)
