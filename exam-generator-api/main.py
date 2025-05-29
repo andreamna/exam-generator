@@ -11,7 +11,7 @@ from generator import parse_multiple_pdfs, summarize_from_json_input, interactiv
 
 app = FastAPI()
 
-UPLOAD_DIR = "uploaded_pdfs"
+UPLOAD_DIR = "/tmp/uploaded_pdfs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/generate_exam/")
